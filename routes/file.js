@@ -1,6 +1,5 @@
 var express = require('express');
 var router = express.Router();
-var multer = require('multer');
 var path = require('path');
 const fs = require('fs');
 
@@ -10,27 +9,23 @@ if (!fs.existsSync(config.folder)) {
     fs.mkdir(config.folder, (err) => { });
 }
 
-var store = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, './uploads');
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + '.' + file.originalname);
-    }
-});
-
-var upload = multer({ storage: store }).single('file');
-
 router.post('/upload', function (req, res, next) {
-    upload(req, res, function (err) {
+    console.log("INCOMING REQUEST FROM NAME SERVER : ");
+    let base64String = req.body.base64;
+    let base64Image = base64String.split(';base64,').pop();
+    fs.open(path.join(__dirname, '../uploads', req.body.fileName), 'w', (err, file) => {
         if (err) {
-            return res.status(501).json({ error: err });
+            return res.status(400).json({ 'error': 'error creating file' });
         }
-        console.log(req.file);
-        return res.json({ originalName: req.file.originalname, uploadName: req.file.filename });
+        fs.writeFile(req.body.fileName, base64Image, { encoding: 'base64' }, (err) => {
+            if (err) {
+                return res.status(400).json({ 'error': 'error writing file' });
+            }
+
+            return res.json({ 'res': 'BODY SUCCESS' });
+        });
     });
 });
-
 
 router.post('/download', function (req, res, next) {
     filepath = path.join(__dirname, '../uploads') + '/' + req.body.filename;
