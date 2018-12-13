@@ -1,10 +1,13 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
-const config = require('./config/config.js');
 const fs = require('fs');
 const fileRoutes = require('./routes/file');
+const syncRoutes = require('./routes/sync');
+var request = require('request');
+var path = require('path');
 
+var config = require(path.join(__dirname, './config', process.argv[2]));
 
 app.use((req, res, next) => {
     next();
@@ -20,9 +23,27 @@ app.use(function (req, res, next) {
 app.use(bodyParser.json({ limit: "15MB", type: 'application/json' }));
 
 app.use('/file', fileRoutes);
+app.use('', syncRoutes);
 
 app.get('/', (req, res) => {
-    res.send('APP ROOT');
+    res.send(config.name);
 });
 
-app.listen(3001);
+function registerWithNameServer() {
+    let payload = {
+        name: config.name,
+        address: config.address
+    }
+    request.post({ url: `${config.nameServerAddress}/register`, json: payload },
+        function (err, httpResponse, body) {
+            if (err) {
+                console.log("REGISTRATION WITH NAME SERVER FAILED");
+                return;
+            }
+            console.log("REGISTRATION WITH NAME SERVER SUCCESS");
+            app.listen(config.port);
+        }
+    );
+}
+
+registerWithNameServer();

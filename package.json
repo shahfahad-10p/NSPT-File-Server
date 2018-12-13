@@ -22,7 +22,8 @@
     "body-parser": "1.18.3",
     "express": "4.16.4",
     "file-saver": "2.0.0",
-    "multer": "1.4.1"
+    "multer": "1.4.1",
+    "request": "2.88.0"
   },
   "devDependencies": {
     "node-dev": "3.1.3"

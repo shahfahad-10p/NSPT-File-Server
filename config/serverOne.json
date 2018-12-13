@@ -1,0 +1,6 @@
+{
+    "name": "File Server One",
+    "address": "http://localhost:3001",
+    "port": "3001",
+    "nameServerAddress": "http://localhost:3000"
+}
