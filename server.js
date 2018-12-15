@@ -2,12 +2,12 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const fs = require('fs');
-const fileRoutes = require('./routes/file');
-const syncRoutes = require('./routes/sync');
 var request = require('request');
 var path = require('path');
-
 var config = require(path.join(__dirname, './config', process.argv[2]));
+global.config = config;
+const fileRoutes = require('./routes/file');
+const syncRoutes = require('./routes/sync');
 
 app.use((req, res, next) => {
     next();
